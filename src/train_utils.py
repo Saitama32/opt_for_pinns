@@ -542,7 +542,6 @@ def get_log_times(opt, log_freq, num_epochs):
     return log_times
 
 def train(model,
-          proj_name,
           pde_name,
           pde_params,
           loss_name,
@@ -552,7 +551,8 @@ def train(model,
           n_t,
           n_res,
           num_epochs,
-          device):
+          device,
+          exp):
     model.apply(init_weights)
 
     x_range, t_range, loss_func, pde_coefs = get_pde(pde_name, pde_params, loss_name)
@@ -562,14 +562,19 @@ def train(model,
     logging_times = get_log_times(opt, LOG_FREQ, num_epochs)
 
     x, t, data_params = get_data(x_range, t_range, n_x, n_t, random=True, num_res_samples=n_res, device=device)
-    wandb.log({'x': x, 't': t}) # Log training set
+    exp.log_parameters({'x': x, 't': t})
+    # wandb.log({'x': x, 't': t}) # Log training set
 
     loss_res, loss_bc, loss_ic = loss_func(x, t, predict(x, t, model))
     loss = loss_res + loss_bc + loss_ic
-    wandb.log({'loss': loss.item(),
+    exp.log_parameters({'loss': loss.item(),
             'loss_res': loss_res.item(),
             'loss_bc': loss_bc.item(),
             'loss_ic': loss_ic.item()})
+    # wandb.log({'loss': loss.item(),
+    #         'loss_res': loss_res.item(),
+    #         'loss_bc': loss_bc.item(),
+    #         'loss_ic': loss_ic.item()})
     
     for i in range(num_epochs):
         model.train()
@@ -624,17 +629,26 @@ def train(model,
                 grad_norm = grad_norm ** 0.5
 
             if isinstance(opt, Adam_LBFGS_NNCG) and i >= opt.switch_epoch2:
-                wandb.log({'step_size': opt.nncg.state_dict()['state'][0]['t']},
+                exp.log_parameters({'step_size': opt.nncg.state_dict()['state'][0]['t']},
                             commit=False)
+                # wandb.log({'step_size': opt.nncg.state_dict()['state'][0]['t']},
+                #             commit=False)
             elif isinstance(opt, Adam_LBFGS_GD) and i >= opt.switch_epoch2:
-                wandb.log({'step_size': opt.gd.state_dict()['state'][0]['t']},
-                            commit=False)
+                exp.log_parameters({'step_size': opt.gd.state_dict()['state'][0]['t']},
+                             commit=False)
+                # wandb.log({'step_size': opt.gd.state_dict()['state'][0]['t']},
+                #             commit=False)
 
-            wandb.log({'loss': loss.item(),
+            exp.log_parameters({'loss': loss.item(),
                 'loss_res': loss_res.item(),
                 'loss_bc': loss_bc.item(),
                 'loss_ic': loss_ic.item(),
                 'grad_norm': grad_norm})
+            # wandb.log({'loss': loss.item(),
+            #     'loss_res': loss_res.item(),
+            #     'loss_bc': loss_bc.item(),
+            #     'loss_ic': loss_ic.item(),
+            #     'grad_norm': grad_norm})
     
     # evaluate errors
     with torch.no_grad():
@@ -653,7 +667,12 @@ def train(model,
     test_l1re = l1_relative_error(predictions, targets)
     test_l2re = l2_relative_error(predictions, targets)
 
-    wandb.log({'train/l1re': train_l1re, 
+    exp.log_parameters({'train/l1re': train_l1re, 
                 'train/l2re': train_l2re, 
                 'test/l1re': test_l1re, 
                 'test/l2re': test_l2re})
+
+    # wandb.log({'train/l1re': train_l1re, 
+    #             'train/l2re': train_l2re, 
+    #             'test/l1re': test_l1re, 
+    #             'test/l2re': test_l2re})

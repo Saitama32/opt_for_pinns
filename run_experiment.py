@@ -1,5 +1,12 @@
 # external libraries and packages
-import wandb
+from comet_ml import start
+from comet_ml.integration.pytorch import log_model
+
+experiment = start(
+  api_key="aP71fQTYPNqfsYWvudPPmoBl5",
+  project_name="chain_prove",
+  workspace="saitama32"
+)
 import argparse
 import sys
 import traceback
@@ -7,6 +14,8 @@ import torch
 
 from src.train_utils import set_random_seed, train
 from src.models import PINN
+
+
 
 def main():
     # Parse arguments
@@ -80,28 +89,30 @@ def main():
         experiment_args["wandb_project"]))
     print("GPU to use: {}".format(experiment_args["device"]))
 
-    with wandb.init(project=experiment_args["wandb_project"], config=experiment_args):
-        # initialize model
-        model = PINN(in_dim=2, hidden_dim=experiment_args["num_neurons"], out_dim=1,
-                     num_layer=experiment_args["num_layers"]).to(experiment_args["device"])
-        # train the model
-        try:
-            train(model,
-                  proj_name=experiment_args["wandb_project"],
-                  pde_name=experiment_args["pde"],
-                  pde_params=experiment_args["pde_params"],
-                  loss_name=experiment_args["loss"],
-                  opt_name=experiment_args["opt"],
-                  opt_params_list=experiment_args["opt_params"],
-                  n_x=experiment_args["num_x"],
-                  n_t=experiment_args["num_t"],
-                  n_res=experiment_args["num_res"],
-                  num_epochs=experiment_args["epochs"],
-                  device=experiment_args["device"])
-        # log error and traceback info to W&B, and exit gracefully
-        except Exception as e:
-            traceback.print_exc(file=sys.stderr)
-            raise e
+    experiment.log_parameters(experiment_args)
+
+    # initialize model
+    model = PINN(in_dim=2, hidden_dim=experiment_args["num_neurons"], out_dim=1,
+                    num_layer=experiment_args["num_layers"]).to(experiment_args["device"])
+    # train the model
+    try:
+        train(model,
+                pde_name=experiment_args["pde"],
+                pde_params=experiment_args["pde_params"],
+                loss_name=experiment_args["loss"],
+                opt_name=experiment_args["opt"],
+                opt_params_list=experiment_args["opt_params"],
+                n_x=experiment_args["num_x"],
+                n_t=experiment_args["num_t"],
+                n_res=experiment_args["num_res"],
+                num_epochs=experiment_args["epochs"],
+                device=experiment_args["device"],
+                exp=experiment
+                )
+    # log error and traceback info to W&B, and exit gracefully
+    except Exception as e:
+        traceback.print_exc(file=sys.stderr)
+        raise e
 
 if __name__ == "__main__":
     main()
