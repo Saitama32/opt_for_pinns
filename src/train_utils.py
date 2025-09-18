@@ -562,7 +562,7 @@ def train(model,
     logging_times = get_log_times(opt, LOG_FREQ, num_epochs)
 
     x, t, data_params = get_data(x_range, t_range, n_x, n_t, random=True, num_res_samples=n_res, device=device)
-    exp.log_parameters({'x': x, 't': t})
+    # exp.log_parameters({'x': x, 't': t})
     # wandb.log({'x': x, 't': t}) # Log training set
 
     loss_res, loss_bc, loss_ic = loss_func(x, t, predict(x, t, model))
