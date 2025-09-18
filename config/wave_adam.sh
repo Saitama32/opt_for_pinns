@@ -12,7 +12,7 @@ opt=adam
 lrs=(0.00001 0.0001 0.001 0.01 0.1)
 epochs=41000
 betas=(1 2 3 4 5)
-devices=(3 4 5 6 7)
+devices=(0)
 proj=wave_adam_final
 max_parallel_jobs=5
 
