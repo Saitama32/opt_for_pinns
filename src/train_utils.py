@@ -7,7 +7,6 @@ from .opts.adam_lbfgs_nncg import Adam_LBFGS_NNCG
 from .opts.adam_lbfgs_gd import Adam_LBFGS_GD
 import random
 import re
-import wandb
 
 LOG_FREQ = 20 # Hard-coded for now -- this is done to match the max_iter of the LBFGS optimizer + save time
 
@@ -578,6 +577,7 @@ def train(model,
     
     for i in range(num_epochs):
         model.train()
+        exp.log_parameters({'current_epoch': i})
 
         # Update the preconditioner for NysNewtonCG
         if isinstance(opt, Adam_LBFGS_NNCG) and i >= opt.switch_epoch2 and i % opt.precond_update_freq == 0:

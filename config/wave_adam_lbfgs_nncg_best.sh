@@ -17,7 +17,7 @@ nncg_mus=(0.00001 0.0001 0.001 0.01 0.1)
 nncg_rank=60
 epochs=5000
 beta=5
-devices=(3 4 5 6 7)
+devices=(0)
 proj=wave_adam_lbfgs_nncg_best
 max_parallel_jobs=5
 
