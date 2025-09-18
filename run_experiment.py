@@ -2,11 +2,7 @@
 from comet_ml import start
 from comet_ml.integration.pytorch import log_model
 
-experiment = start(
-  api_key="aP71fQTYPNqfsYWvudPPmoBl5",
-  project_name="chain_prove",
-  workspace="saitama32"
-)
+
 import argparse
 import sys
 import traceback
@@ -52,6 +48,12 @@ def main():
     # set initial seed
     initial_seed = args.seed
     set_random_seed(initial_seed)
+
+    experiment = start(
+        api_key="aP71fQTYPNqfsYWvudPPmoBl5",
+        project_name=args.wandb_project,
+        workspace="saitama32"
+        )
 
     # organize arguments for the experiment into a dictionary for logging purpose
     experiment_args = {

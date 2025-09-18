@@ -11,7 +11,7 @@ num_res=10000
 opt=lbfgs
 epochs=2050
 betas=(1 2 3 4 5)
-devices=(3 4 5 6 7)
+devices=(0)
 proj=wave_lbfgs_final
 max_parallel_jobs=5
 
