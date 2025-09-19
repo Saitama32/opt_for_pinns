@@ -566,10 +566,11 @@ def train(model,
 
     loss_res, loss_bc, loss_ic = loss_func(x, t, predict(x, t, model))
     loss = loss_res + loss_bc + loss_ic
-    exp.log_parameters({'loss': loss.item(),
-            'loss_res': loss_res.item(),
-            'loss_bc': loss_bc.item(),
-            'loss_ic': loss_ic.item()})
+    exp.log_metric("loss", loss.item(), step=i)
+    exp.log_metric("loss_res", loss_res.item(), step=i)
+    exp.log_metric("loss_bc", loss_bc.item(), step=i)
+    exp.log_metric("loss_ic", loss_ic.item(), step=i)
+    
     # wandb.log({'loss': loss.item(),
     #         'loss_res': loss_res.item(),
     #         'loss_bc': loss_bc.item(),
@@ -629,21 +630,39 @@ def train(model,
                 grad_norm = grad_norm ** 0.5
 
             if isinstance(opt, Adam_LBFGS_NNCG) and i >= opt.switch_epoch2:
-                exp.log_parameters({'step_size': opt.nncg.state_dict()['state'][0]['t']},
-                            commit=False)
+                exp.log_metric("step_size", opt.nncg.state_dict()['state'][0]['t'], step=i)
                 # wandb.log({'step_size': opt.nncg.state_dict()['state'][0]['t']},
                 #             commit=False)
+                with torch.no_grad():
+                    predictions = torch.vstack(predict(x, t, model)).cpu().detach().numpy()
+                targets = get_ref_solutions(pde_name, pde_coefs, x, t, data_params)
+                train_l1re = l1_relative_error(predictions, targets)
+                train_l2re = l2_relative_error(predictions, targets)
+
+                # coarse grid for testing
+                n_x_test = int((n_x - 1) / 2) + 1
+                n_t_test = n_t
+                x_test, t_test, data_params_test = get_data(x_range, t_range, n_x_test, n_t_test, random=False, device=device)
+                with torch.no_grad():
+                    predictions = torch.vstack(predict(x_test, t_test, model)).cpu().detach().numpy()
+                targets = get_ref_solutions(pde_name, pde_coefs, x_test, t_test, data_params_test)
+                test_l1re = l1_relative_error(predictions, targets)
+                test_l2re = l2_relative_error(predictions, targets)
+
+                exp.log_metric("train/l1re", train_l1re, step=i)
+                exp.log_metric("train/l2re", train_l2re, step=i)
+                exp.log_metric("test/l1re", test_l1re, step=i)
+                exp.log_metric("test/l2re", test_l2re, step=i)
             elif isinstance(opt, Adam_LBFGS_GD) and i >= opt.switch_epoch2:
-                exp.log_parameters({'step_size': opt.gd.state_dict()['state'][0]['t']},
-                             commit=False)
+                exp.log_metric("step_size", opt.nncg.state_dict()['state'][0]['t'], step=i)
                 # wandb.log({'step_size': opt.gd.state_dict()['state'][0]['t']},
                 #             commit=False)
 
-            exp.log_parameters({'loss': loss.item(),
-                'loss_res': loss_res.item(),
-                'loss_bc': loss_bc.item(),
-                'loss_ic': loss_ic.item(),
-                'grad_norm': grad_norm})
+            exp.log_metric("loss", loss.item(), step=i)
+            exp.log_metric("loss_res", loss_res.item(), step=i)
+            exp.log_metric("loss_bc", loss_bc.item(), step=i)
+            exp.log_metric("loss_ic", loss_ic.item(), step=i)
+            exp.log_metric("grad_norm", grad_norm, step=i)
             # wandb.log({'loss': loss.item(),
             #     'loss_res': loss_res.item(),
             #     'loss_bc': loss_bc.item(),
