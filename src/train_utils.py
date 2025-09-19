@@ -290,15 +290,15 @@ def get_data(x_range, t_range, x_num, t_num, random=False, num_res_samples=1e4, 
         data_params["res_idx"] = np.arange((x_num - 2) * (t_num - 1))
 
     # move data to target device
-    if device != 'cpu': 
-        x_left = torch.tensor(x_left, dtype=torch.float32, requires_grad=True).to(device)
-        t_left = torch.tensor(t_left, dtype=torch.float32, requires_grad=True).to(device)
-        x_upper = torch.tensor(x_upper, dtype=torch.float32, requires_grad=True).to(device)
-        t_upper = torch.tensor(t_upper, dtype=torch.float32, requires_grad=True).to(device)
-        x_lower = torch.tensor(x_lower, dtype=torch.float32, requires_grad=True).to(device)
-        t_lower = torch.tensor(t_lower, dtype=torch.float32, requires_grad=True).to(device)
-        x_res = torch.tensor(x_res, dtype=torch.float32, requires_grad=True).to(device)
-        t_res = torch.tensor(t_res, dtype=torch.float32, requires_grad=True).to(device)
+    # if device != 'cpu': 
+    x_left = torch.tensor(x_left, dtype=torch.float32, requires_grad=True).to(device)
+    t_left = torch.tensor(t_left, dtype=torch.float32, requires_grad=True).to(device)
+    x_upper = torch.tensor(x_upper, dtype=torch.float32, requires_grad=True).to(device)
+    t_upper = torch.tensor(t_upper, dtype=torch.float32, requires_grad=True).to(device)
+    x_lower = torch.tensor(x_lower, dtype=torch.float32, requires_grad=True).to(device)
+    t_lower = torch.tensor(t_lower, dtype=torch.float32, requires_grad=True).to(device)
+    x_res = torch.tensor(x_res, dtype=torch.float32, requires_grad=True).to(device)
+    t_res = torch.tensor(t_res, dtype=torch.float32, requires_grad=True).to(device)
 
     # form tuples
     x = (x_res, x_left, x_upper, x_lower)

@@ -19,7 +19,7 @@ epochs=5000
 beta=5
 devices=(0)
 proj=wave_adam_lbfgs_nncg_best
-max_parallel_jobs=5
+max_parallel_jobs=2
 
 background_pids=()
 current_device=0
