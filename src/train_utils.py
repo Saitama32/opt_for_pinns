@@ -566,11 +566,10 @@ def train(model,
 
     loss_res, loss_bc, loss_ic = loss_func(x, t, predict(x, t, model))
     loss = loss_res + loss_bc + loss_ic
-    exp.log_metric("loss", loss.item(), step=i)
-    exp.log_metric("loss_res", loss_res.item(), step=i)
-    exp.log_metric("loss_bc", loss_bc.item(), step=i)
-    exp.log_metric("loss_ic", loss_ic.item(), step=i)
-    
+    exp.log_parameters({'loss': loss.item(),
+            'loss_res': loss_res.item(),
+            'loss_bc': loss_bc.item(),
+            'loss_ic': loss_ic.item()})
     # wandb.log({'loss': loss.item(),
     #         'loss_res': loss_res.item(),
     #         'loss_bc': loss_bc.item(),
