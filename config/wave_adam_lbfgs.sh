@@ -3,7 +3,7 @@
 pde=wave
 seeds=(123 234 345 456 567)
 losses=(mse)
-n_neurons=(50 100 200 400)
+n_neurons=(200 400 50 100)
 n_layers=4
 num_x=257
 num_t=101
@@ -12,7 +12,7 @@ opt=adam_lbfgs
 switch_epochs=1000
 adam_lrs=(0.00001 0.0001 0.001 0.01 0.1)
 epochs=3000
-betas=(1 2 3 4 5)
+betas=(5)
 devices=(0)
 proj=wave_adam_lbfgs_final
 max_parallel_jobs=5
