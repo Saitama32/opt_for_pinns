@@ -1,9 +1,9 @@
 #!/bin/bash
 
 pde=wave
-seeds=(123 234 345)
+seeds=(456 567 678)
 losses=(mse)
-n_neurons=(200 400 50 100)
+n_neurons=(50 100 200 400)
 n_layers=4
 num_x=257
 num_t=101
